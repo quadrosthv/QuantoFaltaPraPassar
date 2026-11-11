@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Quanto falta pra passar</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&display=swap">
+<style>
+/* Layout: resumo do que falta no topo; abaixo, uma ficha por disciplina com os 3 trimestres lado a lado (desktop) ou empilhados (celular).
+   Cores: azul de caneta como acento, vermelho de caneta pra nota abaixo da média, como no boletim de papel. */
+:root{
+  --bg:#EDF1F8;
+  --surface:#FFFFFF;
+  --surface-2:#F4F6FB;
+  --line:#D5DCEA;
+  --ink:#0F1B33;
+  --ink-2:#506082;
+  --accent:#1B4DDB;
+  --on-accent:#FFFFFF;
+  --accent-soft:#E2EAFF;
+  --good:#15744A;
+  --good-soft:#DCF2E6;
+  --warn:#8F5600;
+  --warn-soft:#FFEFCF;
+  --bad:#BE242B;
+  --bad-soft:#FCE2E3;
+  --display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --text:'Instrument Sans','Segoe UI',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1120;
+    --surface:#141C2F;
+    --surface-2:#1A2440;
+    --line:#27334F;
+    --ink:#E8EDF8;
+    --ink-2:#97A5C4;
+    --accent:#7C9DFF;
+    --on-accent:#0B1120;
+    --accent-soft:#1F2D57;
+    --good:#5AD39A;
+    --good-soft:#12312A;
+    --warn:#F2B34E;
+    --warn-soft:#3A2D13;
+    --bad:#FF7E83;
+    --bad-soft:#3C1B22;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1120;
+  --surface:#141C2F;
+  --surface-2:#1A2440;
+  --line:#27334F;
+  --ink:#E8EDF8;
+  --ink-2:#97A5C4;
+  --accent:#7C9DFF;
+  --on-accent:#0B1120;
+  --accent-soft:#1F2D57;
+  --good:#5AD39A;
+  --good-soft:#12312A;
+  --warn:#F2B34E;
+  --warn-soft:#3A2D13;
+  --bad:#FF7E83;
+  --bad-soft:#3C1B22;
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--text);font-size:15px;line-height:1.45;
+  padding-block:1.25rem 3rem;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:1060px;margin:0 auto;display:flex;flex-direction:column;gap:1.25rem}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* topo */
+.top{display:flex;flex-wrap:wrap;gap:.75rem 1.5rem;align-items:flex-end;justify-content:space-between}
+.top-text{min-width:0;flex:1 1 320px}
+.eyebrow{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);font-weight:600;margin:0 0 .3rem}
+h1{font-size:clamp(1.9rem,6vw,2.7rem);line-height:1.02;font-weight:750;letter-spacing:-.02em}
+.intro{margin:.55rem 0 0;color:var(--ink-2);max-width:60ch}
+.actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem .9rem;font-size:.85rem;font-weight:600}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.status{font-size:.78rem;color:var(--ink-2);min-height:1.1em;flex-basis:100%}
+
+.demo{display:flex;flex-wrap:wrap;gap:.5rem .9rem;align-items:center;background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:.65rem .9rem;font-size:.88rem;font-weight:500}
+
+details.rules{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.1rem .9rem}
+details.rules summary{cursor:pointer;padding:.65rem 0;font-weight:600;font-size:.9rem}
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;padding:.25rem 0 .6rem}
+.field{display:flex;flex-direction:column;gap:.3rem;font-size:.8rem;color:var(--ink-2);font-weight:600}
+.field input,.field select{height:2.5rem;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);padding:0 .6rem;font:inherit;font-size:1rem}
+.note{margin:0 0 .8rem;font-size:.82rem;color:var(--ink-2);max-width:68ch}
+
+/* resumo */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.1rem 1rem;display:flex;flex-direction:column;gap:.9rem}
+.panel h2{font-size:1.3rem;font-weight:700;letter-spacing:-.01em}
+.hint{margin:.25rem 0 0;color:var(--ink-2);font-size:.88rem;max-width:62ch}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem}
+.stat{display:flex;align-items:baseline;gap:.5rem;padding:.5rem .7rem;border-radius:10px;background:var(--surface-2)}
+.stat b{font-family:var(--display);font-size:1.4rem;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.78rem;color:var(--ink-2);line-height:1.2}
+.stat.s-ok b{color:var(--good)}
+.stat.s-mid b{color:var(--warn)}
+.stat.s-out b{color:var(--bad)}
+@media (max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.rank{list-style:none;margin:0;padding:0}
+.rank li+li{border-top:1px solid var(--line)}
+.rank-btn{width:100%;text-align:left;background:transparent;border:0;border-radius:10px;padding:.7rem .4rem;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.1rem .9rem;align-items:baseline}
+.rank-btn:hover{background:var(--surface-2)}
+.rank-name{font-family:var(--display);font-weight:650;font-size:1.02rem}
+.rank-need{font-family:var(--display);font-weight:700;font-size:1.25rem;font-variant-numeric:tabular-nums;text-align:right}
+.rank-need small{font-family:var(--text);font-weight:500;font-size:.74rem;color:var(--ink-2);margin-left:.3rem}
+.rank-sub{grid-column:1 / -1;font-size:.8rem;color:var(--ink-2)}
+.bar{grid-column:1 / -1;position:relative;height:8px;margin-top:.35rem;border-radius:99px;background:var(--surface-2);border:1px solid var(--line)}
+.bar i{position:absolute;inset:-1px auto -1px -1px;border-radius:99px;background:var(--bar,var(--accent))}
+.bar b{position:absolute;top:-4px;bottom:-4px;width:2px;border-radius:2px;background:var(--ink-2);opacity:.7}
+.s-easy{--bar:var(--accent)}
+.s-mid{--bar:var(--warn)}
+.s-hard,.s-out{--bar:var(--bad)}
+.rank-need.s-easy{color:var(--accent)}
+.rank-need.s-mid{color:var(--warn)}
+.rank-need.s-hard,.rank-need.s-out{color:var(--bad)}
+.s-out .bar i,.bar.s-out i{background:repeating-linear-gradient(135deg,var(--bad) 0 6px,transparent 6px 10px);outline:1px solid var(--bad)}
+.empty-msg{margin:0;color:var(--ink-2);font-size:.92rem}
+.chips-row{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:0;font-size:.82rem;color:var(--ink-2)}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:.2rem .65rem;font-size:.8rem}
+.chip:hover{border-color:var(--accent)}
+.chip.s-ok{color:var(--good);background:var(--good-soft);border-color:transparent}
+
+/* lista */
+.list-head{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;justify-content:space-between}
+.list-head h2{font-size:1.3rem;font-weight:700}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--surface-2)}
+.seg button{border:0;background:transparent;color:var(--ink-2);border-radius:999px;padding:.32rem .6rem;font-size:.75rem;font-weight:600;line-height:1.2}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.seg-lg button{padding:.4rem .8rem;font-size:.82rem}
+.cards{display:flex;flex-direction:column;gap:.65rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.9rem .9rem .5rem;transition:box-shadow .2s}
+.card.flash{box-shadow:0 0 0 3px var(--accent)}
+.card-top{display:flex;flex-wrap:wrap;gap:.35rem .75rem;align-items:center;justify-content:space-between}
+.card-name{font-size:1.08rem;font-weight:700;letter-spacing:-.005em}
+.card-detail{margin:.3rem 0 .55rem;font-size:.84rem;color:var(--ink-2);max-width:46ch}
+.pill{--chip-bg:var(--surface-2);--chip-fg:var(--ink-2);display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .65rem;border-radius:999px;font-size:.78rem;font-weight:650;white-space:nowrap;background:var(--chip-bg);color:var(--chip-fg)}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.s-ok{--chip-bg:var(--good-soft);--chip-fg:var(--good)}
+.pill.s-easy{--chip-bg:var(--accent-soft);--chip-fg:var(--accent)}
+.pill.s-mid{--chip-bg:var(--warn-soft);--chip-fg:var(--warn)}
+.pill.s-hard,.pill.s-out,.pill.s-fail{--chip-bg:var(--bad-soft);--chip-fg:var(--bad)}
+
+.tri{display:grid;grid-template-columns:2.9rem minmax(0,1fr) auto;grid-template-areas:"l f s";gap:.5rem;align-items:center;padding:.55rem 0;border-top:1px solid var(--line)}
+.tri-label{grid-area:l;display:flex;flex-direction:column;gap:.05rem;min-width:0}
+.tri-name{font-size:.78rem;font-weight:650;color:var(--ink-2)}
+.est{font-size:.72rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.est.low{color:var(--bad)}
+.seg{grid-area:s}
+.tri-fields{grid-area:f;display:flex;gap:.4rem;align-items:center;min-width:0}
+.works{display:flex;flex-wrap:wrap;gap:.35rem;min-width:0}
+.in{height:2.5rem;width:2.9rem;text-align:center;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font-family:var(--text);font-size:1rem;font-weight:600;font-variant-numeric:tabular-nums;padding:0}
+.in-c{width:4.3rem}
+.in::placeholder{color:var(--ink-2);opacity:.55;font-weight:400}
+.in.low{color:var(--bad)}
+.in[aria-invalid="true"]{border-color:var(--bad);background:var(--bad-soft)}
+.in:focus-visible{border-color:var(--accent);outline-offset:1px}
+
+.nw{display:flex;align-items:center;gap:.5rem;margin:0 0 .55rem;font-size:.8rem;color:var(--ink-2);font-weight:600}
+.step{width:2rem;height:2rem;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font-size:1.1rem;line-height:1;padding:0}
+.step:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.step:disabled{opacity:.4;cursor:default}
+.nw-val{min-width:1.2rem;text-align:center;color:var(--ink);font-variant-numeric:tabular-nums;font-size:.95rem}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.primary:hover{color:var(--on-accent);filter:brightness(1.08)}
+.btn:disabled{opacity:.6;cursor:default}
+.modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(8,12,24,.62);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal-card{width:min(560px,100%);max-height:100%;overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:1rem;display:flex;flex-direction:column;gap:.75rem}
+.modal-card h2{font-size:1.2rem}
+.shot img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.modal-actions{display:flex;flex-wrap:wrap;gap:.5rem}
+.modal .note{margin:0;min-height:1.2em}
+
+@media (max-width:360px){
+  .tri{grid-template-columns:2.9rem minmax(0,1fr);grid-template-areas:"l f" "l s"}
+}
+@media (min-width:880px){
+  .card{display:grid;grid-template-columns:minmax(210px,1.15fr) repeat(3,minmax(0,1fr));gap:.25rem 1.4rem;align-items:start;padding:1rem 1.25rem 1.05rem}
+  .card-head{padding-top:.15rem}
+  .tri{grid-template-columns:minmax(0,1fr);grid-template-areas:"l" "s" "f";gap:.45rem;border-top:0;padding:0;align-items:start;justify-items:start}
+  .tri-label{flex-direction:row;align-items:baseline;gap:.6rem}
+  .est{font-size:.8rem}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<main class="wrap">
+  <header class="top">
+    <div class="top-text">
+      <p class="eyebrow">Boletim 2026 · 3 trimestres</p>
+      <h1>Quanto falta pra passar</h1>
+      <p class="intro" id="intro"></p>
+    </div>
+    <div class="actions">
+      <button class="btn primary" type="button" id="exportBtn">Exportar imagem</button>
+      <button class="btn" type="button" id="demoBtn">Ver exemplo</button>
+      <button class="btn" type="button" id="clearBtn">Limpar notas</button>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </header>
+
+  <div class="demo" id="demoBanner" hidden>
+    <span>Isto é um exemplo com notas inventadas. Nada daqui é salvo.</span>
+    <button class="btn" type="button" id="demoExit">Voltar às minhas notas</button>
+  </div>
+
+  <details class="rules" id="rules">
+    <summary>Regras de cálculo</summary>
+    <div class="rules-grid">
+      <label class="field">Média mínima<input id="rMin" type="number" inputmode="decimal" step="0.5" min="0" max="100"></label>
+      <label class="field">Nota máxima<input id="rMax" type="number" inputmode="decimal" step="1" min="1" max="100"></label>
+      <label class="field">Trabalhos por trimestre (padrão)
+        <select id="rN"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+      </label>
+    </div>
+    <p class="note">Quando o trimestre não tem nota fechada, a nota estimada é a soma dos trabalhos já corrigidos dividida pelo número de trabalhos. Trabalho sem nota conta como zero na estimativa, mas pode ser preenchido depois. O número de trabalhos começa igual pra todas as disciplinas (campo acima) e cada disciplina pode ter o seu, nos botões − e + do cartão dela, que aparecem quando algum trimestre está em Parcial.</p>
+    <p class="note">Fora do alcance quer dizer que, só com o 3º trimestre, a disciplina não chega na média mínima. Confira com a escola se existe recuperação.</p>
+  </details>
+
+  <section class="panel" aria-labelledby="hFalta">
+    <div>
+      <h2 id="hFalta">O que falta no 3º trimestre</h2>
+      <p class="hint" id="rankHint"></p>
+    </div>
+    <div class="stats" id="stats"></div>
+    <ol class="rank" id="rank"></ol>
+    <p class="chips-row" id="okRow" hidden></p>
+    <p class="chips-row" id="emptyRow" hidden></p>
+  </section>
+
+  <section aria-labelledby="hNotas">
+    <div class="list-head">
+      <h2 id="hNotas">Notas por disciplina</h2>
+      <div class="seg seg-lg" id="filters" role="group" aria-label="Filtrar disciplinas">
+        <button type="button" data-f="all" aria-pressed="true">Todas</button>
+        <button type="button" data-f="pend" aria-pressed="false">Pendentes</button>
+        <button type="button" data-f="ok" aria-pressed="false">Aprovadas</button>
+      </div>
+    </div>
+    <div class="cards" id="cards" style="margin-top:.75rem"></div>
+  </section>
+</main>
+
+<div class="modal" id="exportModal" role="dialog" aria-modal="true" aria-labelledby="exTitle" hidden>
+  <div class="modal-card">
+    <h2 id="exTitle">Resumo em imagem</h2>
+    <div class="shot"><img id="shotImg" alt="Prévia do resumo exportado"></div>
+    <p class="note" id="exMsg" aria-live="polite"></p>
+    <div class="modal-actions">
+      <button class="btn primary" type="button" id="exSave">Salvar imagem</button>
+      <button class="btn" type="button" id="exClose">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SUBJECTS = [
+    ['projeto-integrador', 'Projeto integrador'], ['literatura', 'Literatura'], ['educacao-fisica', 'Educação física'],
+    ['geografia', 'Geografia'], ['espanhol', 'Espanhol'], ['ingles', 'Inglês'], ['fisica', 'Física'],
+    ['matematica', 'Matemática'], ['quimica', 'Química'], ['sociologia', 'Sociologia'],
+    ['ensino-religioso', 'Ensino religioso'], ['escrita-criativa', 'Escrita criativa'],
+    ['artes-integradas', 'Artes integradas'], ['biologia', 'Biologia'], ['historia', 'História'],
+    ['portugues', 'Português'], ['educacao-financeira', 'Educação financeira']
+  ];
+  var MAXN = 6;
+  var TRI = ['1º tri', '2º tri', '3º tri'];
+  var LS_KEY = 'quanto-falta-pra-passar-v1';
+  var nf = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
+  function fmt(x) { return nf.format(Math.round(x * 100) / 100); }
+  function ceil2(x) { return Math.ceil(x * 100 - 1e-9) / 100; }
+  function pl(n, s, p) { return n === 1 ? s : p; }
+
+  /* ---------- estado ---------- */
+  function blankTri(m) { return { m: m, c: '', w: ['', '', '', '', '', ''] }; }
+  function blankSubj() { return { n: null, t: [blankTri('c'), blankTri('c'), blankTri('p')] }; }
+  function nOf(s, R) { return (s.n >= 1 && s.n <= MAXN) ? s.n : R.n; }
+  function blankState() {
+    var s = { v: 1, rules: { min: 6, max: 10, n: 3 }, subj: {} };
+    SUBJECTS.forEach(function (sj) { s.subj[sj[0]] = blankSubj(); });
+    return s;
+  }
+  function normalize(o) {
+    var s = blankState();
+    try {
+      if (o && o.rules) {
+        var mx = +o.rules.max, mn = +o.rules.min, n = Math.round(+o.rules.n);
+        if (mx > 0 && mx <= 100) s.rules.max = mx;
+        if (mn >= 0 && mn <= s.rules.max) s.rules.min = mn;
+        if (n >= 1 && n <= MAXN) s.rules.n = n;
+      }
+      SUBJECTS.forEach(function (sj) {
+        var src = o && o.subj && o.subj[sj[0]];
+        if (!src || !src.t) return;
+        var nn = Math.round(+src.n);
+        if (nn >= 1 && nn <= MAXN) s.subj[sj[0]].n = nn;
+        for (var i = 0; i < 3; i++) {
+          var t = src.t[i]; if (!t) continue;
+          var d = s.subj[sj[0]].t[i];
+          d.m = t.m === 'p' ? 'p' : 'c';
+          d.c = typeof t.c === 'string' ? t.c.slice(0, 6) : '';
+          for (var k = 0; k < MAXN; k++) d.w[k] = (t.w && typeof t.w[k] === 'string') ? t.w[k].slice(0, 6) : '';
+        }
+      });
+    } catch (e) { /* usa o padrão */ }
+    return s;
+  }
+  function demoState() {
+    var s = blankState();
+    var rows = {
+      'projeto-integrador': [8, 7.5, ['8']], 'literatura': [6, 5, ['4', '5']], 'educacao-fisica': [9, 9, ['9']],
+      'geografia': [5, 6.5, ['6']], 'espanhol': [7, 6, ['7', '6,5']], 'ingles': [8, 8.5, []],
+      'fisica': [4.5, 5, ['3', '4', '5']], 'matematica': [5.5, 5, ['6']], 'quimica': [3, 4, ['2']],
+      'sociologia': [7, 7.5, ['8', '7']], 'ensino-religioso': [9.5, 10, []], 'escrita-criativa': [6, 6, ['6']],
+      'artes-integradas': [7, 8, ['', '7']], 'biologia': [5, 5.5, ['5', '5']], 'historia': [6.5, 7, []],
+      'portugues': [6, 6.5, ['7', '5']], 'educacao-financeira': [8, 9, ['10']]
+    };
+    Object.keys(rows).forEach(function (id) {
+      var r = rows[id], t = s.subj[id].t;
+      t[0].c = String(r[0]).replace('.', ','); t[1].c = String(r[1]).replace('.', ',');
+      r[2].forEach(function (w, i) { t[2].w[i] = w; });
+    });
+    s.subj['matematica'].n = 4;
+    s.subj['portugues'].n = 2;
+    return s;
+  }
+  function hasData(s) {
+    return SUBJECTS.some(function (sj) {
+      return s.subj[sj[0]].t.some(function (t) { return t.c !== '' || t.w.some(function (w) { return w !== ''; }); });
+    });
+  }
+
+  var real = blankState();
+  var S = real;
+  var demo = false;
+
+  /* ---------- cálculo ---------- */
+  function parse(v, max) {
+    if (v == null) return null;
+    v = String(v).trim().replace(',', '.');
+    if (v === '') return null;
+    var x = Number(v);
+    if (!isFinite(x) || x < 0 || x > max) return NaN;
+    return x;
+  }
+  function triInfo(t, R, n) {
+    if (t.m === 'c') {
+      var v = parse(t.c, R.max);
+      if (v == null || v !== v) return { kind: 'blank' };
+      return { kind: 'known', val: v, est: false };
+    }
+    var sum = 0, k = 0;
+    for (var i = 0; i < n; i++) {
+      var x = parse(t.w[i], R.max);
+      if (x != null && x === x) { sum += x; k++; }
+    }
+    return { kind: k === n ? 'known' : 'open', val: sum / n, sum: sum, k: k, r: n - k, est: k < n };
+  }
+  function evalSubject(s, R) {
+    var target = 3 * R.min;
+    var n = nOf(s, R);
+    var a = triInfo(s.t[0], R, n), b = triInfo(s.t[1], R, n), c = triInfo(s.t[2], R, n);
+    var miss = [];
+    [a, b].forEach(function (x, i) { if (x.kind === 'blank' || (x.kind === 'open' && x.k === 0)) miss.push(i); });
+    var o = { a: a, b: b, c: c };
+    if (miss.length) { o.state = 'empty'; o.miss = miss; return o; }
+    var sum12 = a.val + b.val;
+    var known3 = c.kind === 'known', sum3 = 0, k3 = 0, r3 = n;
+    if (c.kind === 'open') { sum3 = c.sum; k3 = c.k; r3 = c.r; }
+    var t3lb = known3 ? c.val : sum3 / n;
+    var lb = sum12 + t3lb;
+    o.sum12 = sum12; o.est12 = a.est || b.est; o.known3 = known3; o.k3 = k3; o.sum3 = sum3; o.r3 = r3; o.target = target;
+    if (lb >= target - 1e-9) { o.state = 'ok'; o.avg = lb / 3; return o; }
+    if (known3) { o.state = 'fail'; o.avg = lb / 3; return o; }
+    var X = target - sum12;
+    o.X = X; o.Xc = ceil2(X);
+    o.ceilT3 = (sum3 + r3 * R.max) / n;
+    if (sum12 + o.ceilT3 < target - 1e-9) { o.state = 'out'; return o; }
+    o.state = 'need';
+    o.avgRem = k3 > 0 ? ceil2((X * n - sum3) / r3) : null;
+    return o;
+  }
+  function sev(o, R) {
+    if (o.Xc <= R.min) return 's-easy';
+    if (o.Xc <= 8 && o.Xc <= R.max) return 's-mid';
+    return 's-hard';
+  }
+  function describe(o, R) {
+    var min = fmt(R.min), est = o.est12 ? ' O 1º ou 2º tri usa nota estimada.' : '';
+    switch (o.state) {
+      case 'empty':
+        return { pill: 'Faltam notas', cls: 's-empty', detail: o.miss.length === 2 ? 'Preencha o 1º e o 2º trimestre.' : 'Falta a nota do ' + TRI[o.miss[0]].replace(' tri', ' trimestre') + '.' };
+      case 'ok':
+        return { pill: 'Aprovada', cls: 's-ok', detail: (o.known3 ? 'Média final ' + fmt(o.avg) + '.' : 'Já tem o suficiente com as notas de hoje.') + est };
+      case 'fail':
+        return { pill: 'Abaixo da média', cls: 's-fail', detail: 'Média final ' + fmt(o.avg) + ', abaixo de ' + min + '.' + est };
+      case 'need':
+        var d = '1º + 2º = ' + fmt(o.sum12) + ' de ' + fmt(o.target) + ' necessários.';
+        if (o.k3 > 0) {
+          d += ' ' + o.k3 + ' ' + pl(o.k3, 'trabalho do 3º tem nota', 'trabalhos do 3º têm nota') + ' (soma ' + fmt(o.sum3) + '); ' +
+            (o.r3 === 1 ? 'o que falta precisa' : 'os ' + o.r3 + ' que faltam precisam') + ' de média ' + fmt(o.avgRem) + '.';
+        }
+        return { pill: 'Precisa de ' + fmt(o.Xc), cls: sev(o, R), detail: d + est };
+      case 'out':
+        var dd = (o.k3 > 0 && o.Xc <= R.max)
+          ? 'Precisaria fechar o 3º tri em ' + fmt(o.Xc) + ', mas com os trabalhos que já tem o teto é ' + fmt(o.ceilT3) + '.'
+          : 'Precisaria de ' + fmt(o.Xc) + ' no 3º tri, acima do máximo (' + fmt(R.max) + ').';
+        return { pill: 'Fora do alcance', cls: 's-out', detail: dd + est };
+    }
+  }
+
+  /* ---------- DOM ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+  function el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
+  var cards = {};
+  var filter = 'all';
+
+  function makeInput(cls, label, ph, k) {
+    var i = document.createElement('input');
+    i.type = 'text'; i.className = 'in ' + cls; i.setAttribute('inputmode', 'decimal');
+    i.setAttribute('autocomplete', 'off'); i.maxLength = 5; i.placeholder = ph;
+    i.setAttribute('aria-label', label); i.dataset.k = k;
+    return i;
+  }
+  function buildCard(sj) {
+    var id = sj[0], name = sj[1];
+    var root = el('article', 'card'); root.dataset.s = id;
+    var head = el('div', 'card-head');
+    var top = el('div', 'card-top');
+    top.appendChild(el('h3', 'card-name', name));
+    var pill = el('span', 'pill'); top.appendChild(pill);
+    var det = el('p', 'card-detail');
+    head.appendChild(top); head.appendChild(det);
+    var nw = el('div', 'nw');
+    nw.appendChild(el('span', '', 'Trabalhos'));
+    var nwMinus = el('button', 'step', '−'), nwVal = el('output', 'nw-val'), nwPlus = el('button', 'step', '+');
+    nwMinus.type = 'button'; nwPlus.type = 'button';
+    nwMinus.dataset.step = '-1'; nwPlus.dataset.step = '1';
+    nwMinus.setAttribute('aria-label', 'Um trabalho a menos em ' + name);
+    nwPlus.setAttribute('aria-label', 'Um trabalho a mais em ' + name);
+    nw.appendChild(nwMinus); nw.appendChild(nwVal); nw.appendChild(nwPlus);
+    head.appendChild(nw);
+    root.appendChild(head);
+    var C = { root: root, pill: pill, det: det, tris: [], name: name, nw: nw, nwVal: nwVal, nwMinus: nwMinus, nwPlus: nwPlus };
+    for (var t = 0; t < 3; t++) {
+      var tri = el('div', 'tri'); tri.dataset.t = String(t);
+      var lab = el('div', 'tri-label');
+      lab.appendChild(el('span', 'tri-name', TRI[t]));
+      var est = el('span', 'est'); lab.appendChild(est);
+      var seg = el('div', 'seg'); seg.setAttribute('role', 'group');
+      seg.setAttribute('aria-label', 'Tipo de nota do ' + TRI[t] + ', ' + name);
+      var bc = el('button', '', 'Fechada'), bp = el('button', '', 'Parcial');
+      bc.type = 'button'; bp.type = 'button'; bc.dataset.mode = 'c'; bp.dataset.mode = 'p';
+      seg.appendChild(bc); seg.appendChild(bp);
+      var f = el('div', 'tri-fields');
+      var ci = makeInput('in-c', 'Nota fechada do ' + TRI[t] + ', ' + name, 'nota', 'c');
+      var ww = el('div', 'works'); var ws = [];
+      for (var k = 0; k < MAXN; k++) {
+        var wi = makeInput('in-w', 'Trabalho ' + (k + 1) + ' do ' + TRI[t] + ', ' + name, '–', String(k));
+        ws.push(wi); ww.appendChild(wi);
+      }
+      f.appendChild(ci); f.appendChild(ww);
+      tri.appendChild(lab); tri.appendChild(seg); tri.appendChild(f);
+      root.appendChild(tri);
+      C.tris.push({ est: est, bc: bc, bp: bp, ci: ci, ww: ww, ws: ws });
+    }
+    cards[id] = C;
+    return root;
+  }
+
+  function mark(inp, str, R) {
+    var v = parse(str, R.max);
+    inp.classList.toggle('low', v != null && v === v && v < R.min);
+    inp.setAttribute('aria-invalid', v !== v ? 'true' : 'false');
+  }
+  function refreshCard(id) {
+    var C = cards[id], s = S.subj[id], R = S.rules;
+    var ev = evalSubject(s, R); C.ev = ev;
+    var n = nOf(s, R);
+    C.nw.hidden = !s.t.some(function (x) { return x.m === 'p'; });
+    C.nwVal.textContent = String(n);
+    C.nwMinus.disabled = n <= 1; C.nwPlus.disabled = n >= MAXN;
+    for (var t = 0; t < 3; t++) {
+      var T = C.tris[t], st = s.t[t];
+      T.bc.setAttribute('aria-pressed', st.m === 'c' ? 'true' : 'false');
+      T.bp.setAttribute('aria-pressed', st.m === 'p' ? 'true' : 'false');
+      T.ci.hidden = st.m !== 'c';
+      T.ww.hidden = st.m !== 'p';
+      mark(T.ci, st.c, R);
+      for (var k = 0; k < MAXN; k++) { T.ws[k].hidden = k >= n; mark(T.ws[k], st.w[k], R); }
+      var ti = triInfo(st, R, n);
+      if (st.m === 'p') {
+        T.est.textContent = ti.k > 0 ? '≈ ' + fmt(ti.val) : '—';
+        T.est.title = 'Estimativa: soma dos trabalhos ÷ ' + n;
+        T.est.classList.toggle('low', ti.k > 0 && ti.val < R.min);
+      } else { T.est.textContent = ''; T.est.classList.remove('low'); }
+    }
+    var d = describe(ev, R);
+    C.pill.className = 'pill ' + d.cls;
+    C.pill.textContent = d.pill;
+    C.det.textContent = d.detail;
+  }
+  function fillCard(id) {
+    var C = cards[id], s = S.subj[id];
+    for (var t = 0; t < 3; t++) {
+      var T = C.tris[t], st = s.t[t];
+      T.ci.value = st.c;
+      for (var k = 0; k < MAXN; k++) T.ws[k].value = st.w[k];
+    }
+    refreshCard(id);
+  }
+  function fillRules() {
+    $('rMin').value = S.rules.min; $('rMax').value = S.rules.max; $('rN').value = String(S.rules.n);
+    $('intro').textContent = 'Cada disciplina precisa de média ' + fmt(S.rules.min) + '. A média é (1º + 2º + 3º tri) ÷ 3, então a soma dos três trimestres tem que chegar a ' + fmt(3 * S.rules.min) + '.';
+    $('rankHint').textContent = 'Quanto cada disciplina precisa tirar no 3º trimestre pra fechar com média ' + fmt(S.rules.min) + '. As mais difíceis aparecem primeiro.';
+  }
+  function fillAll() {
+    fillRules();
+    SUBJECTS.forEach(function (sj) { fillCard(sj[0]); });
+    refreshSummary();
+  }
+
+  function jumpTo(id) {
+    if (filter !== 'all') { setFilter('all'); }
+    var C = cards[id]; if (!C) return;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    C.root.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+    C.root.classList.add('flash');
+    setTimeout(function () { C.root.classList.remove('flash'); }, 1300);
+  }
+  function chip(id, cls) {
+    var b = el('button', 'chip ' + (cls || ''), cards[id].name);
+    b.type = 'button'; b.addEventListener('click', function () { jumpTo(id); });
+    return b;
+  }
+
+  function refreshSummary() {
+    var R = S.rules, groups = { ok: [], need: [], out: [], empty: [] };
+    SUBJECTS.forEach(function (sj) {
+      var ev = cards[sj[0]].ev, g = ev.state === 'fail' ? 'out' : ev.state;
+      groups[g].push({ id: sj[0], ev: ev });
+    });
+    var st = $('stats'); st.textContent = '';
+    [['s-ok', groups.ok.length, 'Garantidas'], ['s-mid', groups.need.length, 'Em jogo'], ['s-out', groups.out.length, 'Fora do alcance'], ['', groups.empty.length, 'Sem notas']].forEach(function (x) {
+      var d = el('div', 'stat ' + x[0]); d.appendChild(el('b', '', String(x[1]))); d.appendChild(el('span', '', x[2])); st.appendChild(d);
+    });
+
+    var rank = $('rank'); rank.textContent = '';
+    var pend = groups.need.concat(groups.out.filter(function (x) { return x.ev.state === 'out'; }));
+    pend.sort(function (p, q) { return q.ev.Xc - p.ev.Xc || cards[p.id].name.localeCompare(cards[q.id].name, 'pt-BR'); });
+    pend.forEach(function (p) {
+      var ev = p.ev, cls = ev.state === 'out' ? 's-out' : sev(ev, R);
+      var li = el('li'); var b = el('button', 'rank-btn'); b.type = 'button';
+      b.appendChild(el('span', 'rank-name', cards[p.id].name));
+      var need = el('span', 'rank-need ' + cls, fmt(ev.Xc));
+      need.appendChild(el('small', '', ev.state === 'out' ? 'no 3º tri · acima do teto' : 'no 3º tri'));
+      b.appendChild(need);
+      if (ev.state === 'need' && ev.k3 > 0) b.appendChild(el('span', 'rank-sub', ev.r3 + ' ' + pl(ev.r3, 'trabalho restante', 'trabalhos restantes') + ': média ' + fmt(ev.avgRem)));
+      if (ev.state === 'out' && ev.k3 > 0 && ev.Xc <= R.max) b.appendChild(el('span', 'rank-sub', 'Com os trabalhos que já tem, o teto do 3º tri é ' + fmt(ev.ceilT3) + '.'));
+      var bar = el('span', 'bar ' + cls); var fill = el('i'); fill.style.width = Math.min(100, ev.Xc / R.max * 100) + '%';
+      var tick = el('b'); tick.style.left = Math.min(100, R.min / R.max * 100) + '%'; tick.title = 'Média mínima ' + fmt(R.min);
+      bar.appendChild(fill); bar.appendChild(tick); b.appendChild(bar);
+      b.addEventListener('click', function () { jumpTo(p.id); });
+      li.appendChild(b); rank.appendChild(li);
+    });
+    if (!pend.length) {
+      var li2 = el('li');
+      var msg;
+      var failN = groups.out.length - 0;
+      if (groups.empty.length === SUBJECTS.length) msg = 'Preencha as notas do 1º e do 2º trimestre pra ver o que falta em cada disciplina.';
+      else if (groups.ok.length + groups.out.length + groups.empty.length === SUBJECTS.length && groups.need.length === 0 && failN === 0 && groups.empty.length === 0) msg = 'Todas as disciplinas já estão aprovadas com as notas de hoje.';
+      else msg = 'Nenhuma disciplina está esperando nota do 3º trimestre agora.';
+      li2.appendChild(el('p', 'empty-msg', msg)); rank.appendChild(li2);
+    }
+
+    var okRow = $('okRow'); okRow.textContent = '';
+    okRow.hidden = !groups.ok.length;
+    if (groups.ok.length) { okRow.appendChild(el('span', '', 'Aprovadas:')); groups.ok.forEach(function (p) { okRow.appendChild(chip(p.id, 's-ok')); }); }
+    var emRow = $('emptyRow'); emRow.textContent = '';
+    emRow.hidden = !groups.empty.length || groups.empty.length === SUBJECTS.length;
+    if (!emRow.hidden) { emRow.appendChild(el('span', '', 'Sem notas do 1º ou 2º tri:')); groups.empty.forEach(function (p) { emRow.appendChild(chip(p.id)); }); }
+
+    var fb = $('filters').querySelectorAll('button');
+    var counts = { all: SUBJECTS.length, pend: SUBJECTS.length - groups.ok.length, ok: groups.ok.length };
+    var labels = { all: 'Todas', pend: 'Pendentes', ok: 'Aprovadas' };
+    for (var i = 0; i < fb.length; i++) { var f = fb[i].dataset.f; fb[i].textContent = labels[f] + ' (' + counts[f] + ')'; }
+    applyFilter();
+  }
+  function applyFilter() {
+    SUBJECTS.forEach(function (sj) {
+      var C = cards[sj[0]], ok = C.ev.state === 'ok';
+      C.root.hidden = !(filter === 'all' || (filter === 'pend' && !ok) || (filter === 'ok' && ok));
+    });
+  }
+  function setFilter(f) {
+    filter = f;
+    var fb = $('filters').querySelectorAll('button');
+    for (var i = 0; i < fb.length; i++) fb[i].setAttribute('aria-pressed', fb[i].dataset.f === f ? 'true' : 'false');
+    applyFilter();
+  }
+
+  /* ---------- salvar ---------- */
+  var docRef = null, saving = false, dirty = false, timer = null, lastJson = '', loadTimer = null, cloud = false;
+  function setStatus(t) { $('status').textContent = t; }
+  function localMsg() { return cloud ? 'Salvo' : 'Salvo só neste aparelho'; }
+  function persistLocal() { try { localStorage.setItem(LS_KEY, JSON.stringify(real)); } catch (e) { /* sem armazenamento */ } }
+  function scheduleSave() {
+    if (demo) return;
+    dirty = true; persistLocal();
+    setStatus(cloud ? 'Salvando…' : 'Salvo só neste aparelho');
+    clearTimeout(timer); timer = setTimeout(flush, 800);
+  }
+  async function flush() {
+    if (!docRef) { dirty = false; return; }
+    if (saving) { timer = setTimeout(flush, 400); return; }
+    var json = JSON.stringify(real);
+    if (json === lastJson) { dirty = false; setStatus('Salvo'); return; }
+    saving = true;
+    try { await docRef.set({ v: 1, json: json }); lastJson = json; setStatus('Salvo'); }
+    catch (e) { setStatus('Não salvou na nuvem. As notas ficam neste aparelho.'); }
+    saving = false;
+    if (JSON.stringify(real) !== json) { clearTimeout(timer); timer = setTimeout(flush, 800); } else { dirty = false; }
+  }
+  async function initCloud() {
+    try {
+      if (!window.claude || !window.claude.use) return;
+      var dbm = await window.claude.use('db'), um = await window.claude.use('user');
+      if (!dbm || !um) return;
+      var uid = await um.id();
+      if (!uid) return;
+      docRef = dbm.doc('data/users/' + uid + '/boletim');
+      cloud = true;
+      setStatus('Conectando…');
+      loadTimer = setTimeout(function () { setStatus('Sem resposta da nuvem. Usando as notas deste aparelho.'); }, 10000);
+      docRef.onSnapshot(function (snap) {
+        if (!snap.exists) {
+          if (snap.metadata && snap.metadata.fromCache) return;
+          clearTimeout(loadTimer);
+          if (hasData(real)) scheduleSave(); else setStatus('Salvo');
+          return;
+        }
+        if (!snap.metadata || !snap.metadata.fromCache) clearTimeout(loadTimer);
+        var j = (snap.data() || {}).json;
+        if (typeof j !== 'string' || j === lastJson) { if (!dirty) setStatus('Salvo'); return; }
+        if (dirty || saving) return;
+        try {
+          real = normalize(JSON.parse(j)); lastJson = j; persistLocal();
+          if (!demo) { S = real; fillAll(); }
+          setStatus('Salvo');
+        } catch (e) { /* ignora dado inválido */ }
+      }, function () { clearTimeout(loadTimer); setStatus('Não deu pra conectar. As notas ficam neste aparelho.'); });
+    } catch (e) { /* segue só com o aparelho */ }
+  }
+
+  /* ---------- eventos ---------- */
+  function onChange(id) {
+    refreshCard(id); refreshSummary(); scheduleSave();
+  }
+  var list = $('cards');
+  SUBJECTS.forEach(function (sj) { list.appendChild(buildCard(sj)); });
+  list.addEventListener('input', function (e) {
+    var inp = e.target;
+    if (!inp.classList || !inp.classList.contains('in')) return;
+    var card = inp.closest('.card'), tri = inp.closest('.tri');
+    var id = card.dataset.s, t = +tri.dataset.t, k = inp.dataset.k;
+    var v = inp.value.replace(/[^0-9.,]/g, '');
+    if (v !== inp.value) inp.value = v;
+    var st = S.subj[id].t[t];
+    if (k === 'c') st.c = v; else st.w[+k] = v;
+    onChange(id);
+  });
+  list.addEventListener('click', function (e) {
+    var sb = e.target.closest && e.target.closest('button[data-step]');
+    if (sb) {
+      var cid = sb.closest('.card').dataset.s, ss = S.subj[cid];
+      ss.n = Math.max(1, Math.min(MAXN, nOf(ss, S.rules) + (+sb.dataset.step)));
+      onChange(cid);
+      return;
+    }
+    var b = e.target.closest && e.target.closest('button[data-mode]');
+    if (!b) return;
+    var card = b.closest('.card'), tri = b.closest('.tri');
+    var id = card.dataset.s, t = +tri.dataset.t;
+    var st = S.subj[id].t[t];
+    if (st.m === b.dataset.mode) return;
+    st.m = b.dataset.mode;
+    onChange(id);
+  });
+  $('filters').addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('button[data-f]');
+    if (b) setFilter(b.dataset.f);
+  });
+
+  function ruleChange() {
+    var mx = parseFloat(String($('rMax').value).replace(',', '.')), mn = parseFloat(String($('rMin').value).replace(',', '.')), n = parseInt($('rN').value, 10);
+    if (mx > 0 && mx <= 100) S.rules.max = mx;
+    if (mn >= 0 && mn <= S.rules.max) S.rules.min = mn;
+    if (n >= 1 && n <= MAXN) S.rules.n = n;
+    $('intro').textContent = 'Cada disciplina precisa de média ' + fmt(S.rules.min) + '. A média é (1º + 2º + 3º tri) ÷ 3, então a soma dos três trimestres tem que chegar a ' + fmt(3 * S.rules.min) + '.';
+    $('rankHint').textContent = 'Quanto cada disciplina precisa tirar no 3º trimestre pra fechar com média ' + fmt(S.rules.min) + '. As mais difíceis aparecem primeiro.';
+    SUBJECTS.forEach(function (sj) { refreshCard(sj[0]); });
+    refreshSummary(); scheduleSave();
+  }
+  ['rMin', 'rMax'].forEach(function (id) { $(id).addEventListener('input', ruleChange); });
+  $('rN').addEventListener('change', ruleChange);
+  $('rMin').addEventListener('blur', fillRules);
+  $('rMax').addEventListener('blur', fillRules);
+
+  function setDemo(on) {
+    demo = on;
+    S = on ? demoState() : real;
+    $('demoBanner').hidden = !on;
+    $('demoBtn').hidden = on;
+    $('clearBtn').hidden = on;
+    $('exportBtn').hidden = on;
+    fillAll();
+    if (!on && cloud) setStatus(dirty ? 'Salvando…' : 'Salvo');
+    if (on) setStatus('');
+  }
+  $('demoBtn').addEventListener('click', function () { setDemo(true); });
+  $('demoExit').addEventListener('click', function () { setDemo(false); });
+
+  var clearArmed = false, clearTimer = null;
+  $('clearBtn').addEventListener('click', function () {
+    var b = $('clearBtn');
+    if (!clearArmed) {
+      clearArmed = true; b.textContent = 'Confirmar: apagar todas as notas'; b.classList.add('danger');
+      clearTimer = setTimeout(resetClear, 4000);
+      return;
+    }
+    resetClear();
+    var rules = real.rules; real = blankState(); real.rules = rules; S = real;
+    fillAll(); scheduleSave();
+  });
+  function resetClear() {
+    clearArmed = false; clearTimeout(clearTimer);
+    var b = $('clearBtn'); b.textContent = 'Limpar notas'; b.classList.remove('danger');
+  }
+
+  /* ---------- exportar imagem ---------- */
+  var FD = '"Bricolage Grotesque","Segoe UI",system-ui,sans-serif';
+  var FT = '"Instrument Sans","Segoe UI",system-ui,sans-serif';
+  function tokens() {
+    var cs = getComputedStyle(document.documentElement);
+    var g = function (n) { return cs.getPropertyValue(n).trim(); };
+    return { bg: g('--bg'), surface: g('--surface'), surface2: g('--surface-2'), line: g('--line'), ink: g('--ink'), ink2: g('--ink-2'),
+      accent: g('--accent'), good: g('--good'), goodSoft: g('--good-soft'), warn: g('--warn'), bad: g('--bad') };
+  }
+  function collect() {
+    var g = { ok: [], need: [], out: [], fail: [], empty: [] };
+    SUBJECTS.forEach(function (sj) { var ev = cards[sj[0]].ev; g[ev.state].push({ id: sj[0], name: sj[1], ev: ev }); });
+    var pend = g.need.concat(g.out);
+    pend.sort(function (p, q) { return q.ev.Xc - p.ev.Xc || p.name.localeCompare(q.name, 'pt-BR'); });
+    var anyEst = SUBJECTS.some(function (sj) {
+      return S.subj[sj[0]].t.some(function (t) { return t.m === 'p' && t.w.some(function (w) { return w !== ''; }); });
+    });
+    return { R: S.rules, g: g, pend: pend, anyEst: anyEst };
+  }
+  function rr(c, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+  }
+  function tx(c, s, x, y, font, color, align) { c.font = font; c.fillStyle = color; c.textAlign = align || 'left'; c.fillText(s, x, y); }
+  function wrapLines(c, s, font, maxW) {
+    c.font = font;
+    var words = s.split(' '), lines = [], cur = '';
+    words.forEach(function (w) {
+      var t = cur ? cur + ' ' + w : w;
+      if (c.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t;
+    });
+    if (cur) lines.push(cur);
+    return lines;
+  }
+  function chipRow(c, T, labels, x, y, maxW, kind) {
+    var h = 46, gap = 12, cx = x, cy = y;
+    labels.forEach(function (s) {
+      c.font = '500 22px ' + FT;
+      var w = Math.ceil(c.measureText(s).width) + 36;
+      if (cx + w > x + maxW && cx > x) { cx = x; cy += h + gap; }
+      rr(c, cx, cy, w, h, h / 2);
+      c.fillStyle = kind === 'ok' ? T.goodSoft : T.surface2; c.fill();
+      if (kind !== 'ok') { c.strokeStyle = T.line; c.lineWidth = 2; c.stroke(); }
+      tx(c, s, cx + w / 2, cy + 30, '500 22px ' + FT, kind === 'ok' ? T.good : T.ink, 'center');
+      cx += w + gap;
+    });
+    return cy + h;
+  }
+  function hline(c, T, x1, x2, y) { c.strokeStyle = T.line; c.lineWidth = 2; c.beginPath(); c.moveTo(x1, y); c.lineTo(x2, y); c.stroke(); }
+  function drawBar(c, T, x, y, w, h, ratio, minRatio, col, hatch) {
+    rr(c, x, y, w, h, h / 2); c.fillStyle = T.surface2; c.fill(); c.strokeStyle = T.line; c.lineWidth = 2; c.stroke();
+    var fw = Math.max(h, w * Math.min(1, ratio));
+    c.save(); rr(c, x, y, fw, h, h / 2); c.clip();
+    if (hatch) {
+      c.strokeStyle = col; c.lineWidth = 3;
+      for (var i = -h; i < fw + h; i += 12) { c.beginPath(); c.moveTo(x + i, y + h); c.lineTo(x + i + h, y); c.stroke(); }
+    } else { c.fillStyle = col; c.fillRect(x, y, fw, h); }
+    c.restore();
+    if (hatch) { rr(c, x, y, fw, h, h / 2); c.strokeStyle = col; c.lineWidth = 2; c.stroke(); }
+    c.globalAlpha = 0.7; c.fillStyle = T.ink2; c.fillRect(x + w * minRatio - 1.5, y - 6, 3, h + 12); c.globalAlpha = 1;
+  }
+  function drawSummary(c, T, D, W, known) {
+    var M = 64, P = 40, IW = W - 2 * M, L = M + P, IN = IW - 2 * P, RT = L + IN, R = D.R;
+    c.fillStyle = T.bg; c.fillRect(0, 0, W, known.H);
+    var y = M;
+    try { c.letterSpacing = '3px'; } catch (e) { /* sem suporte */ }
+    tx(c, 'BOLETIM 2026 · 3 TRIMESTRES', M, y + 18, '600 20px ' + FT, T.ink2);
+    try { c.letterSpacing = '0px'; } catch (e) { /* sem suporte */ }
+    y += 18 + 40;
+    var title = 'Quanto falta pra passar', fs = 78;
+    while (fs > 40) { c.font = '750 ' + fs + 'px ' + FD; if (c.measureText(title).width <= IW) break; fs -= 2; }
+    tx(c, title, M, y + fs * 0.8, '750 ' + fs + 'px ' + FD, T.ink);
+    y += fs + 8;
+    var sub = 'Média mínima ' + fmt(R.min) + '. A soma dos três trimestres precisa chegar a ' + fmt(3 * R.min) + '.';
+    wrapLines(c, sub, '400 26px ' + FT, IW).forEach(function (ln) { tx(c, ln, M, y + 26, '400 26px ' + FT, T.ink2); y += 38; });
+    y += 28;
+
+    var top = y;
+    rr(c, M, top, IW, known.panelH, 28); c.fillStyle = T.surface; c.fill(); c.strokeStyle = T.line; c.lineWidth = 2; c.stroke();
+    y = top + P;
+    tx(c, 'O que falta no 3º trimestre', L, y + 34, '700 38px ' + FD, T.ink);
+    y += 34 + 28;
+
+    var bw = (IN - 48) / 4, stats = [
+      [D.g.ok.length, 'Garantidas', T.good], [D.g.need.length, 'Em jogo', T.warn],
+      [D.g.out.length + D.g.fail.length, 'Fora do alcance', T.bad], [D.g.empty.length, 'Sem notas', T.ink]
+    ];
+    stats.forEach(function (s, i) {
+      var bx = L + i * (bw + 16);
+      rr(c, bx, y, bw, 104, 18); c.fillStyle = T.surface2; c.fill();
+      tx(c, String(s[0]), bx + 20, y + 54, '700 46px ' + FD, s[2]);
+      tx(c, s[1], bx + 20, y + 86, '500 21px ' + FT, T.ink2);
+    });
+    y += 104 + 14;
+
+    if (!D.pend.length) {
+      var msg = D.g.empty.length === SUBJECTS.length
+        ? 'Preencha as notas do 1º e do 2º trimestre pra ver o que falta.'
+        : 'Nenhuma disciplina está esperando nota do 3º trimestre agora.';
+      y += 20; tx(c, msg, L, y + 24, '400 24px ' + FT, T.ink2); y += 24 + 14;
+    }
+    D.pend.forEach(function (p, i) {
+      var ev = p.ev, isOut = ev.state === 'out';
+      var col = isOut ? T.bad : (ev.Xc <= R.min ? T.accent : (ev.Xc <= 8 && ev.Xc <= R.max ? T.warn : T.bad));
+      if (i > 0) hline(c, T, L, RT, y);
+      y += 26;
+      var base = y + 30;
+      tx(c, p.name, L, base, '650 30px ' + FD, T.ink);
+      var lab = isOut ? 'no 3º tri · acima do teto' : 'no 3º tri';
+      c.font = '500 20px ' + FT; var sw = c.measureText(lab).width;
+      tx(c, lab, RT, base, '500 20px ' + FT, T.ink2, 'right');
+      tx(c, fmt(ev.Xc), RT - sw - 12, base + 2, '700 40px ' + FD, col, 'right');
+      y = base + 22;
+      var subTxt = '';
+      if (ev.state === 'need' && ev.k3 > 0) subTxt = ev.r3 + ' ' + pl(ev.r3, 'trabalho restante', 'trabalhos restantes') + ': média ' + fmt(ev.avgRem);
+      if (isOut && ev.k3 > 0 && ev.Xc <= R.max) subTxt = 'Com os trabalhos que já tem, o teto do 3º tri é ' + fmt(ev.ceilT3) + '.';
+      if (subTxt) { tx(c, subTxt, L, y + 20, '400 22px ' + FT, T.ink2); y += 34; }
+      y += 8;
+      drawBar(c, T, L, y, IN, 14, ev.Xc / R.max, R.min / R.max, col, isOut);
+      y += 14 + 26;
+    });
+
+    if (D.g.fail.length) {
+      y += 14;
+      tx(c, 'Fechadas abaixo da média', L, y + 24, '600 24px ' + FT, T.ink2);
+      y += 24 + 12;
+      D.g.fail.forEach(function (p, i) {
+        hline(c, T, L, RT, y);
+        y += 22;
+        var base = y + 30;
+        tx(c, p.name, L, base, '650 30px ' + FD, T.ink);
+        tx(c, 'Média final ' + fmt(p.ev.avg), RT, base, '700 28px ' + FD, T.bad, 'right');
+        y = base + 22;
+      });
+    }
+    if (D.g.ok.length) {
+      y += 22;
+      tx(c, 'Aprovadas · ' + D.g.ok.length, L, y + 24, '600 24px ' + FT, T.ink2);
+      y += 24 + 16;
+      y = chipRow(c, T, D.g.ok.map(function (p) { return p.name; }), L, y, IN, 'ok');
+    }
+    if (D.g.empty.length && D.g.empty.length < SUBJECTS.length) {
+      y += 32;
+      tx(c, 'Sem notas do 1º ou 2º tri · ' + D.g.empty.length, L, y + 24, '600 24px ' + FT, T.ink2);
+      y += 24 + 16;
+      y = chipRow(c, T, D.g.empty.map(function (p) { return p.name; }), L, y, IN, 'empty');
+    }
+    var panelBottom = y + P;
+    var panelH = panelBottom - top;
+    var fy = panelBottom + 44;
+    tx(c, 'Gerado em ' + new Date().toLocaleDateString('pt-BR'), M, fy, '500 20px ' + FT, T.ink2);
+    if (D.anyEst) {
+      fy += 32;
+      tx(c, 'Trimestres parciais usam a estimativa: soma dos trabalhos ÷ número de trabalhos.', M, fy, '400 20px ' + FT, T.ink2);
+    }
+    return { panelH: panelH, H: Math.ceil(fy + M) };
+  }
+  async function makeImage() {
+    try {
+      await Promise.race([
+        Promise.all([
+          document.fonts.load('750 40px "Bricolage Grotesque"'), document.fonts.load('700 40px "Bricolage Grotesque"'),
+          document.fonts.load('650 30px "Bricolage Grotesque"'), document.fonts.load('400 20px "Instrument Sans"'),
+          document.fonts.load('500 20px "Instrument Sans"'), document.fonts.load('600 20px "Instrument Sans"')
+        ]),
+        new Promise(function (r) { setTimeout(r, 2500); })
+      ]);
+    } catch (e) { /* usa as fontes de reserva */ }
+    var T = tokens(), D = collect(), W = 1080, SC = 2;
+    var a = document.createElement('canvas'); a.width = W; a.height = 10;
+    var m = drawSummary(a.getContext('2d'), T, D, W, { H: 10, panelH: 0 });
+    if (W * SC * m.H * SC > 14e6) SC = Math.sqrt(14e6 / (W * m.H));
+    var cv = document.createElement('canvas'); cv.width = Math.floor(W * SC); cv.height = Math.floor(m.H * SC);
+    var c = cv.getContext('2d'); c.scale(SC, SC);
+    drawSummary(c, T, D, W, m);
+    return cv;
+  }
+  function ymd() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  var exBtn = $('exportBtn'), modal = $('exportModal'), lastCv = null, dl = null;
+  function closeModal() { modal.hidden = true; exBtn.focus(); }
+  exBtn.addEventListener('click', async function () {
+    exBtn.disabled = true; exBtn.textContent = 'Gerando…';
+    try {
+      lastCv = await makeImage();
+      $('shotImg').src = lastCv.toDataURL('image/png');
+      try { dl = (window.claude && window.claude.use) ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
+      if (!dl && !(window.claude && window.claude.use)) {
+        dl = { save: function (o) {
+          return new Promise(function (res, rej) {
+            try {
+              var u = URL.createObjectURL(o.data), a = document.createElement('a');
+              a.href = u; a.download = o.filename; document.body.appendChild(a); a.click(); a.remove();
+              setTimeout(function () { URL.revokeObjectURL(u); }, 4000); res({ status: 'saved' });
+            } catch (e) { rej(e); }
+          });
+        } };
+      }
+      $('exSave').hidden = !dl;
+      $('exMsg').textContent = dl ? '' : 'Aqui não dá pra baixar direto. Segure a imagem pra salvar ou tire um print.';
+      modal.hidden = false;
+      (dl ? $('exSave') : $('exClose')).focus();
+    } catch (e) { setStatus('Não deu pra gerar a imagem.'); }
+    exBtn.disabled = false; exBtn.textContent = 'Exportar imagem';
+  });
+  $('exSave').addEventListener('click', function () {
+    if (!lastCv || !dl) return;
+    lastCv.toBlob(function (b) {
+      if (!b) { $('exMsg').textContent = 'Não consegui montar o arquivo.'; return; }
+      dl.save({ filename: 'quanto-falta-pra-passar-' + ymd() + '.png', data: b })
+        .then(function () { $('exMsg').textContent = 'Imagem salva.'; })
+        .catch(function (e) {
+          $('exMsg').textContent = (e && e.code === 'declined') ? 'Salvamento cancelado.' : 'Não deu pra salvar aqui. Segure a imagem pra salvar ou tire um print.';
+        });
+    }, 'image/png');
+  });
+  $('exClose').addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (modal.hidden) return;
+    if (e.key === 'Escape') { closeModal(); return; }
+    if (e.key === 'Tab') {
+      var f = [$('exSave'), $('exClose')].filter(function (b) { return !b.hidden; });
+      var i = f.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+
+  /* ---------- início ---------- */
+  try {
+    var raw = localStorage.getItem(LS_KEY);
+    if (raw) { real = normalize(JSON.parse(raw)); S = real; setStatus('Salvo só neste aparelho'); }
+  } catch (e) { /* começa vazio */ }
+  fillAll();
+  initCloud();
+})();
+</script>
+
+</body>
+</html>
